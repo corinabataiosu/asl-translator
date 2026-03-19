@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.asltranslator.databinding.FragmentGalleryBinding
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.tasks.vision.gesturerecognizer.GestureRecognizerResult
@@ -32,6 +33,10 @@ class GalleryFragment : Fragment(), GestureRecognizerHelper.GestureRecognizerLis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         gestureRecognizerHelper = GestureRecognizerHelper(requireContext(), this)
+
+        binding.btnHome.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
         binding.btnPickImage.setOnClickListener {
             pickImageLauncher.launch("image/*")

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="dark_blue">#FF111E35</color>
-    <color name="blue">#FF1A4FD6</color>
+    <color name="pink">#F29285</color>
     <color name="gray_blue">#FFB0BEC5</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
+    <color name="very_dark_brown">#1A1614</color>
+    <color name="dark_brown">#2B2320</color>
+    <color name="brown">#40332E</color>
+    <color name="brown_bg">#FAF7F5</color>
+    <color name="light_brown">#F0EAE6</color>
 </resources>

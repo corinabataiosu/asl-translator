@@ -18,30 +18,45 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_lessons"
-            android:layout_width="200dp"
-            android:layout_height="80dp"
-            android:layout_margin="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="12dp"
             android:text="@string/lessons_button"
-            android:textColor="@android:color/black"
-            android:textSize="18sp" />
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="20sp"
+            app:backgroundTint="?attr/colorSurface"
+            app:cornerRadius="@dimen/button_corner_radius"
+            app:strokeWidth="@dimen/button_stroke_width"
+            app:strokeColor="?attr/colorPrimary"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_camera"
-            android:layout_width="200dp"
-            android:layout_height="80dp"
-            android:layout_margin="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="12dp"
             android:text="@string/camera_button"
-            android:textColor="@android:color/black"
-            android:textSize="18sp" />
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="20sp"
+            app:backgroundTint="?attr/colorSurface"
+            app:cornerRadius="@dimen/button_corner_radius"
+            app:strokeWidth="@dimen/button_stroke_width"
+            app:strokeColor="?attr/colorPrimary"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_gallery"
-            android:layout_width="200dp"
-            android:layout_height="80dp"
-            android:layout_margin="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="12dp"
             android:text="@string/gallery_button"
-            android:textColor="@android:color/black"
-            android:textSize="18sp" />
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="20sp"
+            app:backgroundTint="?attr/colorSurface"
+            app:cornerRadius="@dimen/button_corner_radius"
+            app:strokeWidth="@dimen/button_stroke_width"
+            app:strokeColor="?attr/colorPrimary"/>
 
     </LinearLayout>
 

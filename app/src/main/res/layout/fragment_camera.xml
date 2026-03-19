@@ -22,10 +22,22 @@
         android:padding="16dp"
         android:textColor="@android:color/white"
         android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_home"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="@dimen/small_margin_bottom" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/home_button"
+        android:src="@drawable/ic_home_filled"
+        app:backgroundTint="?attr/colorPrimary"
+        app:tint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="32dp"
-        android:text="Detection..." />
+        android:layout_marginBottom="@dimen/margin_bottom" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

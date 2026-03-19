@@ -11,7 +11,18 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="ASL Translator" />
+            app:title="ASL Translator">
+            <ImageView
+                android:id="@+id/btn_theme_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="@dimen/small_margin_bottom"
+                android:padding="8dp"
+                android:contentDescription="@string/theme_toggle_desc"
+                android:src="@drawable/ic_theme"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+        </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <fragment

@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.example.asltranslator.databinding.FragmentCameraBinding
 import com.google.mediapipe.tasks.vision.gesturerecognizer.GestureRecognizerResult
@@ -36,10 +37,14 @@ class CameraFragment : Fragment(), GestureRecognizerHelper.GestureRecognizerList
         super.onViewCreated(view, savedInstanceState)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
+        binding.btnHome.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         gestureRecognizerHelper = GestureRecognizerHelper(
             requireContext(),
             this,
-            com.google.mediapipe.tasks.vision.core.RunningMode.LIVE_STREAM
+            RunningMode.LIVE_STREAM
         )
 
         if (allPermissionsGranted()) {

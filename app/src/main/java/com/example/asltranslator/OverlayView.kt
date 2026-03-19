@@ -36,7 +36,7 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
     private fun initPaints() {
         // line design
-        linePaint.color = Color.parseColor("#00FF00")
+        linePaint.color = Color.parseColor("#F29285")
         linePaint.strokeWidth = 8f
         linePaint.style = Paint.Style.STROKE
 
