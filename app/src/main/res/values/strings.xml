@@ -13,4 +13,9 @@
     <string name="theme_toggle_desc">Toggle Theme</string>
     <string name="load_photo_from_gallery">Load photo from gallery</string>
     <string name="home_button">Home</string>
+    <string name="guide_title">The Guide to Learn ASL Alphabet</string>
+    <string name="guide_subtitle">Start by watching the tutorial then exercise the signs with our quiz.\n3 days ago | 5 min read</string>
+    <string name="guide_question">Do you think you\'ve mastered ASL alphabet?</string>
+    <string name="take_quiz_button">Take our quiz</string>
+    <string name="choose_correct_answer">Choose the correct answer</string>
 </resources>

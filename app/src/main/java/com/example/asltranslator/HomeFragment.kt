@@ -26,8 +26,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnLessons.setOnClickListener {
-            // lessons placeholder until implementation
-            Toast.makeText(requireContext(), "Lessons module coming soon!", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_homeFragment_to_lessonsStudyFragment)
         }
 
         binding.btnCamera.setOnClickListener {

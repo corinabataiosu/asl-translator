@@ -22,7 +22,30 @@
             app:destination="@id/galleryFragment" 
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"/>
+        <action
+            android:id="@+id/action_homeFragment_to_lessonsStudyFragment"
+            app:destination="@id/lessonsStudyFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/lessonsStudyFragment"
+        android:name="com.example.asltranslator.LessonsStudyFragment"
+        android:label="Lessons"
+        tools:layout="@layout/fragment_lessons_study">
+        <action
+            android:id="@+id/action_lessonsStudyFragment_to_lessonsQuizFragment"
+            app:destination="@id/lessonsQuizFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/lessonsQuizFragment"
+        android:name="com.example.asltranslator.LessonsQuizFragment"
+        android:label="Quiz"
+        tools:layout="@layout/fragment_lessons_quiz" />
 
     <fragment
         android:id="@+id/cameraFragment"

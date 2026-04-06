@@ -31,7 +31,8 @@ class MainActivity : AppCompatActivity() {
         // navigation configuration
         val navController = findNavController(R.id.nav_host_fragment)
         val appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.homeFragment, R.id.cameraFragment, R.id.galleryFragment
+            R.id.homeFragment, R.id.cameraFragment, R.id.galleryFragment,
+            R.id.lessonsStudyFragment, R.id.lessonsQuizFragment
         ))
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
 
