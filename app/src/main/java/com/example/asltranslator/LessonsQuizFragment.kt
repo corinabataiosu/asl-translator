@@ -8,21 +8,29 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import com.example.asltranslator.databinding.FragmentLessonsQuizBinding
 import org.json.JSONArray
 import java.io.InputStream
+
+data class Question(val imagePath: String, val answer: String, val options: List<String>)
+
+class QuizViewModel : ViewModel() {
+    val questions = mutableListOf<Question>()
+    var currentQuestionIndex = 0
+    var score = 0
+    var isLoaded = false
+    var currentShuffledOptions = listOf<String>()
+}
 
 class LessonsQuizFragment : Fragment() {
 
     private var _binding: FragmentLessonsQuizBinding? = null
     private val binding get() = _binding!!
 
-    data class Question(val imagePath: String, val answer: String, val options: List<String>)
-
-    private val questions = mutableListOf<Question>()
-    private var currentQuestionIndex = 0
-    private var score = 0
+    private val viewModel: QuizViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,7 +43,10 @@ class LessonsQuizFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loadQuestionsFromJson()
+        if (!viewModel.isLoaded) {
+            loadQuestionsFromJson()
+            viewModel.isLoaded = true
+        }
 
         binding.btnHome.setOnClickListener {
             findNavController().popBackStack(R.id.homeFragment, false)
@@ -55,7 +66,7 @@ class LessonsQuizFragment : Fragment() {
             }
         }
 
-        if (questions.isNotEmpty()) {
+        if (viewModel.questions.isNotEmpty()) {
             displayQuestion()
         }
     }
@@ -80,19 +91,23 @@ class LessonsQuizFragment : Fragment() {
                 for (j in 0 until optionsArray.length()) {
                     options.add(optionsArray.getString(j))
                 }
-                questions.add(Question(image, answer, options))
+                viewModel.questions.add(Question(image, answer, options))
             }
-            questions.shuffle() // Randomize the order of questions
+            viewModel.questions.shuffle()
+            
+            if (viewModel.questions.isNotEmpty()) {
+                viewModel.currentShuffledOptions = viewModel.questions[0].options.shuffled()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     private fun displayQuestion() {
-        if (currentQuestionIndex < questions.size) {
-            val question = questions[currentQuestionIndex]
+        if (viewModel.currentQuestionIndex < viewModel.questions.size) {
+            val question = viewModel.questions[viewModel.currentQuestionIndex]
 
-            binding.tvQuizProgress.text = "Întrebarea ${currentQuestionIndex + 1} din ${questions.size}"
+            binding.tvQuizProgress.text = "Question ${viewModel.currentQuestionIndex + 1} of ${viewModel.questions.size}"
 
             try {
                 val inputStream: InputStream = requireContext().assets.open(question.imagePath)
@@ -110,10 +125,13 @@ class LessonsQuizFragment : Fragment() {
                 binding.btnOption4
             )
 
-            val shuffledOptions = question.options.shuffled()
+            if (viewModel.currentShuffledOptions.isEmpty()) {
+                viewModel.currentShuffledOptions = question.options.shuffled()
+            }
+
             for (i in buttons.indices) {
-                if (i < shuffledOptions.size) {
-                    buttons[i].text = shuffledOptions[i]
+                if (i < viewModel.currentShuffledOptions.size) {
+                    buttons[i].text = viewModel.currentShuffledOptions[i]
                     buttons[i].visibility = View.VISIBLE
                 } else {
                     buttons[i].visibility = View.GONE
@@ -125,18 +143,25 @@ class LessonsQuizFragment : Fragment() {
     }
 
     private fun checkAnswer(selectedAnswer: String) {
-        val currentQuestion = questions[currentQuestionIndex]
+        val currentQuestion = viewModel.questions[viewModel.currentQuestionIndex]
         if (selectedAnswer == currentQuestion.answer) {
-            score++
+            viewModel.score++
         }
-        currentQuestionIndex++
+        viewModel.currentQuestionIndex++
+        
+        if (viewModel.currentQuestionIndex < viewModel.questions.size) {
+            viewModel.currentShuffledOptions = viewModel.questions[viewModel.currentQuestionIndex].options.shuffled()
+        } else {
+            viewModel.currentShuffledOptions = emptyList()
+        }
+        
         displayQuestion()
     }
 
     private fun showResultDialog() {
         AlertDialog.Builder(requireContext())
-            .setTitle("Quiz Terminat")
-            .setMessage("Ai obținut scorul: $score / ${questions.size}")
+            .setTitle("The quiz is over!")
+            .setMessage("You have achieved a score of: ${viewModel.score} / ${viewModel.questions.size}")
             .setPositiveButton("OK") { _, _ ->
                 findNavController().popBackStack(R.id.homeFragment, false)
             }

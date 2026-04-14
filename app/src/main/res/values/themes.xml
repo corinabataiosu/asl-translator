@@ -1,13 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.ASLTranslator" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/pink</item>
+        <item name="colorPrimary">@color/accent</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="android:colorBackground">@color/brown_bg</item>
-        <item name="android:windowBackground">@color/brown_bg</item>
-        <item name="colorSurface">@color/light_brown</item>
-        <item name="colorOnSurface">@color/very_dark_brown</item>
-        <item name="colorOnBackground">@color/very_dark_brown</item>
+        <item name="android:colorBackground">@color/bg_light</item>
+        <item name="android:windowBackground">@color/bg_light</item>
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="colorOnSurface">@color/text_light</item>
+        <item name="colorOnBackground">@color/text_light</item>
+        <item name="colorOutline">#CBD5E1</item>
     </style>
 
     <style name="Theme.ASLTranslator" parent="Base.Theme.ASLTranslator" />

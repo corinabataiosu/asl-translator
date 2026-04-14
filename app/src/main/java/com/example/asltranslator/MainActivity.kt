@@ -3,6 +3,7 @@ package com.example.asltranslator
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,11 +17,14 @@ import com.example.asltranslator.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_UNSPECIFIED) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }
+        prefs = getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
+        // load saved theme, default to Dark Mode (MODE_NIGHT_YES) if not set
+        val savedMode = prefs.getInt("night_mode", AppCompatDelegate.MODE_NIGHT_YES)
+        AppCompatDelegate.setDefaultNightMode(savedMode)
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -38,28 +42,16 @@ class MainActivity : AppCompatActivity() {
 
         val btnThemeToggle = findViewById<ImageView>(R.id.btn_theme_toggle)
         btnThemeToggle?.setOnClickListener {
-            val currentNightMode = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
-            if (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            // read from SharedPreferences to know the current forced state
+            val currentMode = prefs.getInt("night_mode", AppCompatDelegate.MODE_NIGHT_YES)
+            val newMode = if (currentMode == AppCompatDelegate.MODE_NIGHT_YES) {
+                AppCompatDelegate.MODE_NIGHT_NO
             } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                AppCompatDelegate.MODE_NIGHT_YES
             }
-        }
-
-        // notifications channel
-        createNotificationChannel()
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Gesture translation"
-            val descriptionText = "Notifications for ASL"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel("ASL_NOTIF", name, importance).apply {
-                description = descriptionText
-            }
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+            
+            prefs.edit().putInt("night_mode", newMode).apply()
+            AppCompatDelegate.setDefaultNightMode(newMode)
         }
     }
 }

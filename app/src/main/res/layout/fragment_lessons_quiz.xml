@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/android:colorBackground"
     tools:context=".LessonsQuizFragment">
 
     <ImageView
@@ -11,7 +12,7 @@
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginTop="48dp"
-        android:background="#D1C4A5"
+        android:background="?attr/colorSurface"
         android:scaleType="fitCenter"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -90,9 +91,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:src="@drawable/ic_home_filled"
-        app:tint="@color/white"
-        app:backgroundTint="@color/dark_brown"
-        app:borderWidth="0dp"
+        app:tint="?attr/colorOnSurface"
+        app:backgroundTint="?attr/colorSurface"
+        app:borderWidth="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" 

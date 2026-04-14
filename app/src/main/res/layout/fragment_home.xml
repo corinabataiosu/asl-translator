@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/android:colorBackground"
     tools:context=".HomeFragment">
 
     <LinearLayout
@@ -28,7 +29,7 @@
             app:backgroundTint="?attr/colorSurface"
             app:cornerRadius="@dimen/button_corner_radius"
             app:strokeWidth="@dimen/button_stroke_width"
-            app:strokeColor="@color/white"/>
+            app:strokeColor="?attr/colorOutline"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_camera"
@@ -42,7 +43,7 @@
             app:backgroundTint="?attr/colorSurface"
             app:cornerRadius="@dimen/button_corner_radius"
             app:strokeWidth="@dimen/button_stroke_width"
-            app:strokeColor="@color/white"/>
+            app:strokeColor="?attr/colorOutline"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_gallery"
@@ -56,7 +57,7 @@
             app:backgroundTint="?attr/colorSurface"
             app:cornerRadius="@dimen/button_corner_radius"
             app:strokeWidth="@dimen/button_stroke_width"
-            app:strokeColor="@color/white"/>
+            app:strokeColor="?attr/colorOutline"/>
 
     </LinearLayout>
 
