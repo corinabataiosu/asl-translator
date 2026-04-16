@@ -10,36 +10,58 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.mediapipe.tasks.vision.core.RunningMode
-import com.example.asltranslator.databinding.FragmentCameraBinding
 import com.google.mediapipe.tasks.vision.gesturerecognizer.GestureRecognizerResult
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+import com.example.asltranslator.ui.theme.ASLTranslatorTheme
+import com.example.asltranslator.ui.screens.CameraScreen
+
 class CameraFragment : Fragment(), GestureRecognizerHelper.GestureRecognizerListener {
 
-    private var _binding: FragmentCameraBinding? = null
-    private val binding get() = _binding!!
     private lateinit var gestureRecognizerHelper: GestureRecognizerHelper
     private lateinit var cameraExecutor: ExecutorService
 
+    private var previewView: PreviewView? = null
+    private var overlayView: OverlayView? = null
+    
+    // Using mutable state to trigger Compose recomposition for detection text
+    private var detectedText by mutableStateOf("")
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentCameraBinding.inflate(inflater, container, false)
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                ASLTranslatorTheme {
+                    CameraScreen(
+                        detectedText = detectedText,
+                        onPreviewViewCreated = { 
+                            previewView = it 
+                            setupCameraIfReady()
+                        },
+                        onOverlayViewCreated = { overlayView = it },
+                        onNavigateBack = { findNavController().popBackStack() }
+                    )
+                }
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         cameraExecutor = Executors.newSingleThreadExecutor()
-
-        binding.btnHome.setOnClickListener {
-            findNavController().popBackStack()
-        }
 
         gestureRecognizerHelper = GestureRecognizerHelper(
             requireContext(),
@@ -54,12 +76,19 @@ class CameraFragment : Fragment(), GestureRecognizerHelper.GestureRecognizerList
         }
     }
 
+    private fun setupCameraIfReady() {
+        if (allPermissionsGranted() && previewView != null) {
+            startCamera()
+        }
+    }
+
     private fun startCamera() {
+        if (previewView == null) return
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
             val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+                it.setSurfaceProvider(previewView!!.surfaceProvider)
             }
 
             val imageAnalyzer = ImageAnalysis.Builder()
@@ -79,16 +108,21 @@ class CameraFragment : Fragment(), GestureRecognizerHelper.GestureRecognizerList
 
     override fun onResults(result: GestureRecognizerResult) {
         activity?.runOnUiThread {
-            if (_binding == null) return@runOnUiThread
+            if (previewView != null && overlayView != null) {
+                overlayView?.setResults(
+                    result,
+                    previewView!!.height,
+                    previewView!!.width,
+                    RunningMode.LIVE_STREAM
+                )
+            }
 
-            // drawing Overlay
-            binding.overlay.setResults(result, binding.viewFinder.height, binding.viewFinder.width, com.google.mediapipe.tasks.vision.core.RunningMode.LIVE_STREAM)
-
-            // notifications logic
             val gesture = result.gestures().firstOrNull()?.firstOrNull()
             if (gesture != null && gesture.score() > 0.6f) {
-                binding.tvOutput.text = "Detected: ${gesture.categoryName()}"
+                detectedText = "Detected: ${gesture.categoryName()}"
                 sendNotification(gesture.categoryName())
+            } else {
+                detectedText = ""
             }
         }
     }
@@ -117,7 +151,8 @@ class CameraFragment : Fragment(), GestureRecognizerHelper.GestureRecognizerList
     override fun onDestroyView() {
         super.onDestroyView()
         cameraExecutor.shutdown()
-        _binding = null
+        previewView = null
+        overlayView = null
     }
 
     override fun onError(error: String) { /* Log error */ }

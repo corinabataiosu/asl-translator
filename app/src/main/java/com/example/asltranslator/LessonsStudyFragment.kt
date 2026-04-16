@@ -1,54 +1,41 @@
 package com.example.asltranslator
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebChromeClient
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.asltranslator.databinding.FragmentLessonsStudyBinding
+import com.example.asltranslator.ui.theme.ASLTranslatorTheme
+import com.example.asltranslator.ui.screens.LessonsStudyScreen
 
 class LessonsStudyFragment : Fragment() {
-
-    private var _binding: FragmentLessonsStudyBinding? = null
-    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLessonsStudyBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // Setup YouTube WebView
-        val videoUrl = "https://www.youtube.com/embed/cGavOVNDj1s?start=46"
-        
-        binding.webviewYoutube.settings.apply {
-            javaScriptEnabled = true
-            domStorageEnabled = true
-            mediaPlaybackRequiresUserGesture = false
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                ASLTranslatorTheme {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        LessonsStudyScreen(
+                            onNavigateToQuiz = { findNavController().navigate(R.id.action_lessonsStudyFragment_to_lessonsQuizFragment) },
+                            onNavigateHome = { findNavController().popBackStack(R.id.homeFragment, false) }
+                        )
+                    }
+                }
+            }
         }
-        binding.webviewYoutube.webChromeClient = WebChromeClient()
-        binding.webviewYoutube.loadUrl(videoUrl)
-
-        binding.btnTakeQuiz.setOnClickListener {
-            findNavController().navigate(R.id.action_lessonsStudyFragment_to_lessonsQuizFragment)
-        }
-
-        binding.btnHome.setOnClickListener {
-            findNavController().popBackStack(R.id.homeFragment, false)
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

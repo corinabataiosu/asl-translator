@@ -1,34 +1,40 @@
 package com.example.asltranslator
 
 import android.app.AlertDialog
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
-import com.example.asltranslator.databinding.FragmentLessonsQuizBinding
+import com.example.asltranslator.ui.screens.LessonsQuizScreen
+import com.example.asltranslator.ui.theme.ASLTranslatorTheme
 import org.json.JSONArray
-import java.io.InputStream
 
 data class Question(val imagePath: String, val answer: String, val options: List<String>)
 
 class QuizViewModel : ViewModel() {
     val questions = mutableListOf<Question>()
-    var currentQuestionIndex = 0
-    var score = 0
+    var currentQuestionIndex by mutableIntStateOf(0)
+    var score by mutableIntStateOf(0)
     var isLoaded = false
-    var currentShuffledOptions = listOf<String>()
+    var currentShuffledOptions by mutableStateOf<List<String>>(emptyList())
 }
 
 class LessonsQuizFragment : Fragment() {
-
-    private var _binding: FragmentLessonsQuizBinding? = null
-    private val binding get() = _binding!!
 
     private val viewModel: QuizViewModel by viewModels()
 
@@ -36,8 +42,27 @@ class LessonsQuizFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLessonsQuizBinding.inflate(inflater, container, false)
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                ASLTranslatorTheme {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        if (viewModel.currentQuestionIndex < viewModel.questions.size) {
+                            LessonsQuizScreen(
+                                viewModel = viewModel,
+                                onCheckAnswer = { checkAnswer(it) },
+                                onNavigateHome = { findNavController().popBackStack(R.id.homeFragment, false) }
+                            )
+                        } else {
+                            Box(modifier = Modifier.fillMaxSize())
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,28 +71,6 @@ class LessonsQuizFragment : Fragment() {
         if (!viewModel.isLoaded) {
             loadQuestionsFromJson()
             viewModel.isLoaded = true
-        }
-
-        binding.btnHome.setOnClickListener {
-            findNavController().popBackStack(R.id.homeFragment, false)
-        }
-
-        val buttons = listOf(
-            binding.btnOption1,
-            binding.btnOption2,
-            binding.btnOption3,
-            binding.btnOption4
-        )
-
-        buttons.forEach { button ->
-            button.setOnClickListener { v ->
-                val selectedAnswer = (v as Button).text.toString()
-                checkAnswer(selectedAnswer)
-            }
-        }
-
-        if (viewModel.questions.isNotEmpty()) {
-            displayQuestion()
         }
     }
 
@@ -103,59 +106,20 @@ class LessonsQuizFragment : Fragment() {
         }
     }
 
-    private fun displayQuestion() {
-        if (viewModel.currentQuestionIndex < viewModel.questions.size) {
-            val question = viewModel.questions[viewModel.currentQuestionIndex]
-
-            binding.tvQuizProgress.text = "Question ${viewModel.currentQuestionIndex + 1} of ${viewModel.questions.size}"
-
-            try {
-                val inputStream: InputStream = requireContext().assets.open(question.imagePath)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                binding.ivHandSign.setImageBitmap(bitmap)
-                inputStream.close()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            val buttons = listOf(
-                binding.btnOption1,
-                binding.btnOption2,
-                binding.btnOption3,
-                binding.btnOption4
-            )
-
-            if (viewModel.currentShuffledOptions.isEmpty()) {
-                viewModel.currentShuffledOptions = question.options.shuffled()
-            }
-
-            for (i in buttons.indices) {
-                if (i < viewModel.currentShuffledOptions.size) {
-                    buttons[i].text = viewModel.currentShuffledOptions[i]
-                    buttons[i].visibility = View.VISIBLE
-                } else {
-                    buttons[i].visibility = View.GONE
-                }
-            }
-        } else {
-            showResultDialog()
-        }
-    }
-
     private fun checkAnswer(selectedAnswer: String) {
         val currentQuestion = viewModel.questions[viewModel.currentQuestionIndex]
         if (selectedAnswer == currentQuestion.answer) {
             viewModel.score++
         }
+        
         viewModel.currentQuestionIndex++
         
         if (viewModel.currentQuestionIndex < viewModel.questions.size) {
             viewModel.currentShuffledOptions = viewModel.questions[viewModel.currentQuestionIndex].options.shuffled()
         } else {
             viewModel.currentShuffledOptions = emptyList()
+            showResultDialog()
         }
-        
-        displayQuestion()
     }
 
     private fun showResultDialog() {
@@ -167,10 +131,5 @@ class LessonsQuizFragment : Fragment() {
             }
             .setCancelable(false)
             .show()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

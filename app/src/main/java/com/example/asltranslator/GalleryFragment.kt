@@ -9,38 +9,56 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.asltranslator.databinding.FragmentGalleryBinding
+import com.example.asltranslator.ui.screens.GalleryScreen
+import com.example.asltranslator.ui.theme.ASLTranslatorTheme
 import com.google.mediapipe.framework.image.BitmapImageBuilder
+import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.gesturerecognizer.GestureRecognizerResult
 
-/**
- * A simple [Fragment] subclass as the second destination in the navigation.
- */
 class GalleryFragment : Fragment(), GestureRecognizerHelper.GestureRecognizerListener {
 
-    private var _binding: FragmentGalleryBinding? = null
-    private val binding get() = _binding!!
     private lateinit var gestureRecognizerHelper: GestureRecognizerHelper
+    
+    private var imageView: ImageView? = null
+    private var overlayView: OverlayView? = null
+    
+    private var detectedText by mutableStateOf("")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentGalleryBinding.inflate(inflater, container, false)
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                ASLTranslatorTheme {
+                    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                        GalleryScreen(
+                            detectedText = detectedText,
+                            onImageViewCreated = { imageView = it },
+                            onOverlayViewCreated = { overlayView = it },
+                            onPickImage = { pickImageLauncher.launch("image/*") },
+                            onNavigateBack = { findNavController().popBackStack() }
+                        )
+                    }
+                }
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         gestureRecognizerHelper = GestureRecognizerHelper(requireContext(), this)
-
-        binding.btnHome.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
-        binding.btnPickImage.setOnClickListener {
-            pickImageLauncher.launch("image/*")
-        }
     }
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -51,7 +69,9 @@ class GalleryFragment : Fragment(), GestureRecognizerHelper.GestureRecognizerLis
                 MediaStore.Images.Media.getBitmap(requireContext().contentResolver, it)
             }.copy(Bitmap.Config.ARGB_8888, true)
 
-            binding.imagePreview.setImageBitmap(bitmap)
+            imageView?.setImageBitmap(bitmap)
+            overlayView?.clear()
+            detectedText = ""
 
             // MediaPipe processing
             val mpImage = BitmapImageBuilder(bitmap).build()
@@ -61,9 +81,16 @@ class GalleryFragment : Fragment(), GestureRecognizerHelper.GestureRecognizerLis
 
     override fun onResults(result: GestureRecognizerResult) {
         activity?.runOnUiThread {
-            binding.overlay.setResults(result, binding.imagePreview.height, binding.imagePreview.width, com.google.mediapipe.tasks.vision.core.RunningMode.IMAGE)
+            if (imageView != null && overlayView != null) {
+                overlayView?.setResults(
+                    result,
+                    imageView!!.height,
+                    imageView!!.width,
+                    RunningMode.IMAGE
+                )
+            }
             val gesture = result.gestures().firstOrNull()?.firstOrNull()
-            binding.tvResult.text = "Image result: ${gesture?.categoryName() ?: "Unrecognized"}"
+            detectedText = "Image result: ${gesture?.categoryName() ?: "Unrecognized"}"
         }
     }
 
@@ -71,6 +98,7 @@ class GalleryFragment : Fragment(), GestureRecognizerHelper.GestureRecognizerLis
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        imageView = null
+        overlayView = null
     }
 }
